@@ -1,0 +1,19 @@
+{
+  "name": "c_and_c",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+     "dev":"nodemon src/app.js"
+  },
+  "keywords": [
+    "javascript",
+    "node",
+    "js"
+  ],
+  "author": "chiranjeev singh sethi",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
