@@ -4,8 +4,19 @@ const app=express()
 /*Route matching is handled through regex expression so the order of different route calls 
 matters a lot. The route that is matched first will be displayed on the server.*/
 // will match only the get call to '/test'
-app.get('/test',(req,res)=>{
-res.send("This is my test in the course called from get")
+
+app.use('/trial',(req,res,next)=>{
+console.log("response 1")
+// If we do not send any response here the API call will get stuck in infinite loop
+next()
+res.send("1st trail completed")
+},(req,res,next)=>{
+console.log("response 2")
+next()
+res.send("2nd trail completed")
+},(req,res,next)=>{
+console.log("response 3")
+res.send("3rd trail completed")
 })
 // ${req.params[password]}
 // In this request we have made a dynamic route which matches the request with given id password and 
