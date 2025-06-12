@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-     "dev":"nodemon src/app.js"
+    "dev": "nodemon src/app.js"
   },
   "keywords": [
     "javascript",
@@ -14,6 +14,7 @@
   "author": "chiranjeev singh sethi",
   "license": "ISC",
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "mongoose": "^8.15.1"
   }
 }

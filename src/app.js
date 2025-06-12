@@ -1,35 +1,29 @@
 const express=require("express")
 const app=express()
-const {adminAuth}=require('./middlewares/md.js')
-// Any request hitting the /admin route will pass through the middleware first to verify the token
-// and then if it is authenticated only then we will move to the next route handler
-// app.use('/admin',(req,res,next)=>{
-// const authToken="xysff"  
-// console.log("middleware is checking")
-// //In real scenario auth token will come inside the request and is referenced by req.body?.token
-// const verifyToken=authToken==="xysff"
-// if(verifyToken){
-// next()
-// }
-// else{
-// res.status(401).send('User of the privelege not found') //by default res.send() gives a code of 200
-// }
-// })
+const {DBConnect}=require('./config/database.js')
+const {userModel}=require('./model/user.js')
 
-app.get('/admin/getAllData',adminAuth,(req,res)=>{
-res.send("Data asked by the admin sent")
-})
-app.get('/admin/deleteAllData',(req,res)=>{
-res.send("Data asked by the admin deleted")
-})
 
-app.get('/users',(req,res)=>{
-console.log(req.query)
-res.send('recieved a get request of users')
+app.post('/signup',async(req,res)=>{
+const userObj={
+firstName:"Akshay",
+lastName:"Saini",
+email:"akshaysaini@gmail.com",
+age:28,
+password:"akshay@123"
 }
-)
-
-
+// creating instance of the userSchema and pushing the data into the collection.
+const user=new userModel(userObj)
+await user.save()
+res.send("Data sent to db")
+})
+// first we need to connect to the database only then we should listen to the server so app.listen is 
+// nested inside the then block of dbconnect function
+DBConnect().then(()=>{
+console.log("database connection estabished")
 app.listen(7646,()=>{
 console.log("listening at port no 7646")
+})
+}).catch((err)=>{
+console.error("Database not connected there is some error")
 })
