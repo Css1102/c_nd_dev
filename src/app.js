@@ -43,11 +43,19 @@ console.log("oops something went wrong")
 }
 })
 
-app.patch('/user',async(req,res)=>{
-const userId=req.body?._id;
+app.patch('/user/:userId',async(req,res)=>{
+const userId=req.params?.userId;
 const data=req.body
 try{
-const updatedObj=await userModel.findByIdAndUpdate({_id:userId},data,{returnDocument:"after"})
+const ALLOWED_UPDATES=["gender","skills","age","photoUrl","about"]
+const isAllowedUpdate=Object.keys(data).every((k)=>ALLOWED_UPDATES.includes(k))
+if(!isAllowedUpdate){
+throw new Error("updating given field not allowed")
+}
+if(data.skills.length>10){
+throw new Error("more than 10 skills not allowed")
+}
+const updatedObj=await userModel.findByIdAndUpdate({_id:userId},data,{returnDocument:"after"},{runValidator:true})
 if(!updatedObj){
 res.status(401).send("something went wrong")
 }
@@ -56,7 +64,7 @@ res.send(updatedObj)
 }
 }
 catch(err){
-console.log("oops something crashed")
+console.log("oops something crashed"+err.message)
 }
 })
 
