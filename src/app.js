@@ -27,6 +27,39 @@ console.log("oops some issue is there")
 }
 })
 
+app.delete('/user',async(req,res)=>{
+const userId=req.body?._id
+try{
+const deleted=await userModel.findByIdAndDelete(userId)
+if(!deleted){
+res.status(401).send("something went wrong")
+}
+else{
+res.send("User deleted successfully")
+}
+}
+catch(err){
+console.log("oops something went wrong")
+}
+})
+
+app.patch('/user',async(req,res)=>{
+const userId=req.body?._id;
+const data=req.body
+try{
+const updatedObj=await userModel.findByIdAndUpdate({_id:userId},data,{returnDocument:"after"})
+if(!updatedObj){
+res.status(401).send("something went wrong")
+}
+else{
+res.send(updatedObj)
+}
+}
+catch(err){
+console.log("oops something crashed")
+}
+})
+
 app.get('/feed',async(req,res)=>{
 try{
 const users=await userModel.find({})
