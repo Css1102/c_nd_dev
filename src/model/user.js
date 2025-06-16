@@ -29,7 +29,6 @@ required:[true,"password is required"],
 unique:true,
 trim:true,
 minLength:8,
-maxLength:50,
 validate(value){
 if(!validator.isStrongPassword(value)){
 throw new Error("password is too weak")

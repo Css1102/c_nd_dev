@@ -2,14 +2,55 @@ const express=require("express")
 const app=express()
 const {DBConnect}=require('./config/database.js')
 const {userModel}=require('./model/user.js')
+const bcrypt=require("bcrypt")
+const {validateLogin}=require('./utils/valid.js')
 // middleware used to convert the json data from request into js object and pushing into db
 app.use(express.json())
 app.post('/signup',async(req,res)=>{
-console.log(req)
+try{
+// We need to validate the data using util functions
+// we need to encrypt the passwords
+const {password,firstName,lastName,email,age}=req.body;
+const passwordHash=await bcrypt.hash(password,10)
+console.log(passwordHash)
+// console.log(req)
 // creating instance of the user model and pushing the data into the collection.
-const user=new userModel(req.body)
+const user=new userModel({
+firstName:firstName,
+lastName:lastName,
+age:age,
+password:passwordHash,
+email:email,
+}
+)
 await user.save()
 res.send("Data sent to db")
+}
+catch(err){
+console.log("error:"+err.message)
+}
+})
+app.post('/login',async(req,res)=>{
+const{email,password}=req.body
+// validateLogin(email)
+try{
+const user=await userModel.findOne({email:email})
+if(!user){
+    console.log("Hello")
+throw new Error("invalid credentials")
+}
+const passwordValid=await bcrypt.compare(password,user?.password)
+
+if(passwordValid){
+res.send("login successfull")
+}
+else{
+throw new Error("Invalid credentials")
+}
+}
+catch(err){
+res.status(400).send(err.message)
+}
 })
 app.get('/user',async(req,res)=>{
 const userEmail=req.body?.email

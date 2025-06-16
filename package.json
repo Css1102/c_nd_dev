@@ -14,6 +14,7 @@
   "author": "chiranjeev singh sethi",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "express": "^5.1.0",
     "mongoose": "^8.15.1",
     "validator": "^13.15.15"
