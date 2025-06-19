@@ -1,4 +1,5 @@
 const mongoose=require('mongoose')
+const jwt=require('jsonwebtoken')
 // External lib to validate the field values and their patterns
 const validator=require('validator')
 const userSchema=new mongoose.Schema({
@@ -61,7 +62,11 @@ skills:{
 type:[String]
 }
 },{timestamps:true});
-
+userSchema.method.getJWT=async function(){
+const user=this;
+const token=await jwt.sign({_id:user._id},"Aksha@91unduURNEJjsj",{expiresIn:"1h"})
+return token;
+}
 const userModel=mongoose.model("User",userSchema)
 
 module.exports={userModel}
