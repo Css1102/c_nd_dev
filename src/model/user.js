@@ -62,7 +62,7 @@ skills:{
 type:[String]
 }
 },{timestamps:true});
-userSchema.method.getJWT=async function(){
+userSchema.methods.getJWT=async function(){
 const user=this;
 const token=await jwt.sign({_id:user._id},"Aksha@91unduURNEJjsj",{expiresIn:"1h"})
 return token;
