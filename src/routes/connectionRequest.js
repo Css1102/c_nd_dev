@@ -49,4 +49,31 @@ res.status(400).send(err.message)
 }
 })
 
+connectionReqRouter.post('/request/review/:status/:requestId',Auth,async(req,res)=>{
+try{
+const loggedInUser=req.user
+const{status,requestId}=req.params
+const isAllowedStatus=["accepted","rejected"]
+if(!isAllowedStatus.includes(status)){
+throw new Error("Invalid status type")
+}
+const connectionRequest=await ConnectionRequest.findOne({
+_id:requestId,
+requestTo:loggedInUser._id,
+status:"interested"
+})
+if(!connectionRequest){
+res.status(404).json({message:"User not found in collection"})
+}
+connectionRequest.status=status
+const data=await connectionRequest.save()
+if(data){
+res.json({message:"Your request has been "+ status})
+}
+}
+catch(err){
+res.status(400).send(err.message)
+}
+})
+
 module.exports={connectionReqRouter}

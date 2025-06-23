@@ -3,9 +3,11 @@ const mongoose=require("mongoose")
 const connectionRequestSchema=new mongoose.Schema({
 requestFrom:{
 type:mongoose.Schema.Types.ObjectId,
-required:true
+required:true,
+ref:"User"
 },
 requestTo:{
+ref:"User",
 type:mongoose.Schema.Types.ObjectId,
 required:true
 },

@@ -3,6 +3,7 @@ const app=express()
 const {DBConnect}=require('./config/database.js')
 const {userModel}=require('./model/user.js')
 const {authRouter}=require('./routes/authRouter.js')
+const {userRouter}=require('./routes/userRouter.js')
 const {profileRouter}=require('./routes/profileRouter.js')
 const {connectionReqRouter}=require('./routes/connectionRequest.js')
 const cookieParser=require("cookie-parser")
@@ -18,6 +19,8 @@ app.use(cookieParser())
 app.use('/',authRouter)
 app.use('/',profileRouter)
 app.use('/',connectionReqRouter)
+app.use('/',userRouter)
+
 app.get('/user',async(req,res)=>{
 const userEmail=req.body?.email
 try{

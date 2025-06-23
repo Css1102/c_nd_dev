@@ -38,27 +38,23 @@ catch(err){
 res.status(400).send(err.message)
 }
 })
-profileRouter.patch('/profile/forgotPassword',Auth,async(req,res)=>{
+profileRouter.post('/profile/forgotPassword',async(req,res)=>{
 try{
-const user=req.user
-const {token}=req.cookies
-console.log(req.token)
-const isLoggedIn= await jwt.verify(token,"Aksha@91unduURNEJjsj")
-
-const {_id}=isLoggedIn
-if(!_id){
-throw new Error("The user is not logged in")
+const email=req.body.email
+const passwordOld=req.body.password
+const userExist=await userModel.findOne({email:email})
+console.log(userExist)
+console.log(req.body.new_password)
+if(!userExist){
+throw new Error("User not found in Db")
 }
-const passwordOld=req.old_password
-const oldPasswrdComp=await bcrypt.compare(passwordOld,user.password)
+const oldPasswrdComp=await bcrypt.compare(passwordOld,userExist.password)
 if(!oldPasswrdComp){
 throw new Error("Password doesnt match")
 }
-else{
-const newPassword=await bcrypt.hash(req.new_password,10)
-req.password=newPassword;
+const newPassword=await bcrypt.hash(req.body.new_password,10)
+const userWithNewPassword=await userModel.findOneAndUpdate({_id:userExist._id},{password:newPassword})
 res.send("Password is updated successfully!")
-}
 }
 catch(err){
 res.status(400).send(err.message)
