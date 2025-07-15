@@ -1,5 +1,6 @@
 const express=require("express")
 const app=express()
+const env=require('dotenv').config()
 const {DBConnect}=require('./config/database.js')
 const {userModel}=require('./model/user.js')
 const {authRouter}=require('./routes/authRouter.js')
@@ -44,8 +45,8 @@ console.log("oops some issue is there")
 
 DBConnect().then(()=>{
 console.log("database connection estabished")
-app.listen(7646,()=>{
-console.log("listening at port no 7646")
+app.listen(process.env.PORT || 7646,()=>{
+console.log(`listening at port no ${process.env.PORT}`)
 })
 }).catch((err)=>{
 console.error("Database not connected there is some error")
