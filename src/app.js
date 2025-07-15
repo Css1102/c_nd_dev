@@ -12,7 +12,7 @@ const cors=require('cors')
 
 // middleware used to convert the json data from request into js object and pushing into db
 app.use(cors({
-origin:"http://localhost:5173",
+origin:"https://resocf-2.onrender.com",
 credentials:true
 }))
 app.use(express.json())
