@@ -63,7 +63,7 @@ if(passwordValid){
 // We pass the userId and a private key inside the jwt.sign method and the browser recieves a jwt
 // token which will be sent to the server everytime the user hits an API.
 const token=await user.getJWT()
-res.cookie("token",token)
+res.cookie("token",token,{httpOnly:true,secure:true,sameSite:"None"})
 res.send(user)
 }
 else{

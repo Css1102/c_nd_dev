@@ -11,6 +11,7 @@ const cookieParser=require("cookie-parser")
 const cors=require('cors')
 
 // middleware used to convert the json data from request into js object and pushing into db
+app.set('trust proxy', 1);
 app.use(cors({
 origin:"https://resocf-2.onrender.com",
 credentials:true
