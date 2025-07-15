@@ -64,7 +64,7 @@ type:[String]
 },{timestamps:true});
 userSchema.methods.getJWT=async function(){
 const user=this;
-const token=await jwt.sign({_id:user._id},"Aksha@91unduURNEJjsj",{expiresIn:"1h"})
+const token=await jwt.sign({_id:user._id},"Aksha@91unduURNEJjsj",{expiresIn:"2d"})
 return token;
 }
 const userModel=mongoose.model("User",userSchema)

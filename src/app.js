@@ -7,8 +7,13 @@ const {userRouter}=require('./routes/userRouter.js')
 const {profileRouter}=require('./routes/profileRouter.js')
 const {connectionReqRouter}=require('./routes/connectionRequest.js')
 const cookieParser=require("cookie-parser")
+const cors=require('cors')
 
 // middleware used to convert the json data from request into js object and pushing into db
+app.use(cors({
+origin:"http://localhost:5173",
+credentials:true
+}))
 app.use(express.json())
 app.use(cookieParser())
 // cookie parser is used to parse the cookie sent from the browser and decipher it

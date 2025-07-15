@@ -15,24 +15,38 @@ authRouter.post('/signup',async(req,res)=>{
 try{
 // We need to validate the data using util functions
 // we need to encrypt the passwords
-const {password,firstName,lastName,email,age}=req.body;
+const {email,password,firstName,lastName}=req.body;
+const doesUserExist=await userModel.findOne({email:email})
+if(doesUserExist){
+throw new Error("Already existing user please login")
+}
 const passwordHash=await bcrypt.hash(password,10)
-console.log(passwordHash)
 // console.log(req)
 // creating instance of the user model and pushing the data into the collection.
 const user=new userModel({
 firstName:firstName,
 lastName:lastName,
-age:age,
 password:passwordHash,
 email:email,
+// gender:gender,
+// photoUrl:photoUrl,
+// about:about,
+// skills:skills,
+
 }
 )
-await user.save()
-res.send("Data sent to db")
+const token=await user.getJWT()
+res.cookie("token",token)
+res.send(user)
+
+const saveResponse=await user.save()
+res.json({message:"Data sent to db",
+    data:saveResponse
+})
 }
 catch(err){
 console.log("error:"+err.message)
+res.status(400).send(err.message)
 }
 })
 authRouter.post('/login',async(req,res)=>{
@@ -41,7 +55,6 @@ const{email,password}=req.body
 try{
 const user=await userModel.findOne({email:email})
 if(!user){
-    console.log("Hello")
 throw new Error("invalid credentials")
 }
 const passwordValid=await bcrypt.compare(password,user?.password)
@@ -51,8 +64,7 @@ if(passwordValid){
 // token which will be sent to the server everytime the user hits an API.
 const token=await user.getJWT()
 res.cookie("token",token)
-console.log(token)
-res.send("login successfull")
+res.send(user)
 }
 else{
 throw new Error("Invalid credentials")
@@ -67,7 +79,7 @@ authRouter.post('/logout',async(req,res)=>{
 res.cookie("token",null,{
 expires:new Date(Date.now())
 })
-console.log(res.mountPath)
+console.log(req.originalUrl)
 res.send("User logged out sucessfully")
 })
 module.exports={authRouter}

@@ -3,7 +3,7 @@ const userRouter=express.Router()
 const {userModel}=require('../model/user.js')
 const {Auth}=require('../middleware/auth.js')
 const {ConnectionRequest}=require('../model/connectionRequest.js')
-
+const {removeOrphanedChildren}=require('../utils/valid.js')
 userRouter.get('/user/requests/recieved',Auth,async(req,res)=>{
 try{
 const loggedInUser=req.user
@@ -12,7 +12,7 @@ const requests=await ConnectionRequest.find({
 requestTo:loggedInUser._id,
 status:"interested"
 }
-).populate("requestFrom",["firstName","lastName","gender","Photourl","about","age","skills"])
+).populate("requestFrom",["firstName","lastName","gender","photoUrl","about","age","skills"])
 
 res.json({
 message:"Data fetched successfully",
@@ -27,12 +27,12 @@ res.status(400).send(err.message)
 userRouter.get('/user/connections',Auth,async(req,res)=>{
 try{
 const loggedInUser=req.user
-
+// await removeOrphanedChildren()
 const connectionRequest=await ConnectionRequest.find({
 $or:[{requestFrom:loggedInUser._id,status:"accepted"}
     ,{requestTo:loggedInUser._id,status:"accepted"}]
-}).populate("requestFrom",["firstName","lastName","gender","Photourl","about","age","skills"]).
-populate("requestTo",["firstName","lastName","gender","Photourl","about","age","skills"])
+}).populate("requestFrom",["firstName","lastName","gender","photoUrl","about","age","skills","createdAt"]).
+populate("requestTo",["firstName","lastName","gender","photoUrl","about","age","skills","createdAt"])
 const data=connectionRequest.map((row)=>{
 if(row.requestFrom._id.toString()===loggedInUser._id.toString()){
 return row.requestTo
@@ -62,14 +62,26 @@ $or:[{requestFrom:loggedInUser._id},
 }).select("requestFrom requestTo")
 const hideUsersFromFeed=new Set()
 connectionRequest.forEach((item)=>{
-hideUsersFromFeed.add(item.requestFrom._id,item.requestTo._id)
+hideUsersFromFeed.add(item.requestFrom._id.toString())
+hideUsersFromFeed.add(item.requestTo._id.toString())
+});
+const SAFE_DATA="firstName lastName gender photoUrl about age skills"
+
+// const feedUsers=await userModel.find({
+// $and:[{_id:{$nin:Array.from(hideUsersFromFeed)}},{_id:{$ne:loggedInUser._id}}]
+// }).select(SAFE_DATA).skip(skipCount).limit(limit)
+const excludedIds = new Set([loggedInUser._id.toString()]);
+connectionRequest.forEach(item => {
+  excludedIds.add(item.requestFrom._id.toString());
+  excludedIds.add(item.requestTo._id.toString());
+});
+
+const feedUsers = await userModel.find({
+  _id: { $nin: Array.from(excludedIds) }
 })
-const SAFE_DATA="firstName lastName gender Photourl about age skills"
-
-const feedUsers=await userModel.find({
-$and:[{_id:{$nin:Array.from(hideUsersFromFeed)},_id:{$ne:loggedInUser._id}}]
-}).select(SAFE_DATA).skip(skipCount).limit(limit)
-
+.select(SAFE_DATA)
+.skip(skipCount)
+.limit(limit);
 res.send(feedUsers)
 }
 catch(err){

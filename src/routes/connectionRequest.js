@@ -13,16 +13,16 @@ const fromUserId=req.user._id
 const toUserId=req.params.toUserId
 const status=req.params.status
 
-const connectionRequest=new ConnectionRequest({
-requestFrom:fromUserId,
- requestTo:toUserId,
- status:status,
-});
-
 const AllowedStatus=["interested","ignored"]
 if(!AllowedStatus.includes(status)){
 throw new Error("given status is prohibited")
 }
+
+
+      const toUser = await userModel.findById(toUserId);
+      if (!toUser) {
+        return res.status(404).json({ message: "User not found!" });
+      }
 const isExistingRequest=await ConnectionRequest.findOne({
 $or:[{requestFrom:fromUserId,requestTo:toUserId}
 ,{requestFrom:toUserId,
@@ -38,6 +38,12 @@ res.status(404).json({message:"User not found"})
 if(isExistingRequest){
 res.status(400).json({message:"Already existing request between same users"})
 }
+const connectionRequest=new ConnectionRequest({
+requestFrom:fromUserId,
+ requestTo:toUserId,
+ status:status,
+});
+
 const data=await connectionRequest.save()
 res.json({
 message:"Connection request send successfully",

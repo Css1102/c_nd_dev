@@ -5,7 +5,6 @@ const Auth=async(req,res,next)=>{
 try{
 const {token}=req.cookies
 const decodeMsg=await jwt.verify(token,"Aksha@91unduURNEJjsj")
-console.log("middleware invoke")
 const {_id}=decodeMsg
 if(!_id){
 throw new Error("Invalid token")
