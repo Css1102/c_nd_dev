@@ -14,7 +14,7 @@ profileRouter.use(express.json())
 profileRouter.get('/profile/view',Auth,async(req,res)=>{
 try{
 const userProfile=req.user
-console.log(userProfile)
+// console.log(userProfile)
 if(!userProfile){
 throw new Error("Invalid user")
 }
