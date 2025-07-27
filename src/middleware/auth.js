@@ -1,10 +1,10 @@
 const {userModel}=require('../model/user.js')
 const jwt=require('jsonwebtoken')
-
+const env=require('dotenv').config()
 const Auth=async(req,res,next)=>{
 try{
 const {token}=req.cookies
-const decodeMsg=await jwt.verify(token,"Aksha@91unduURNEJjsj")
+const decodeMsg=await jwt.verify(token,process.env.SECRET_KEY)
 const {_id}=decodeMsg
 if(!_id){
 throw new Error("Invalid token")

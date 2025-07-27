@@ -2,11 +2,12 @@ const mongoose=require('mongoose')
 const jwt=require('jsonwebtoken')
 // External lib to validate the field values and their patterns
 const validator=require('validator')
+const env=require('dotenv').config()
 const userSchema=new mongoose.Schema({
 firstName:{
 type:String,
 required:true,
-minLength:4,
+minLength:3,
 maxLength:50,
 },
 lastName:{
@@ -30,12 +31,6 @@ required:[true,"password is required"],
 unique:true,
 trim:true,
 minLength:8,
-validate(value){
-if(!validator.isStrongPassword(value)){
-throw new Error("password is too weak")
-}
-}
-
 },
 age:{
 type:Number,
@@ -60,11 +55,11 @@ type:String
 },
 skills:{
 type:[String]
-}
+},
 },{timestamps:true});
 userSchema.methods.getJWT=async function(){
 const user=this;
-const token=await jwt.sign({_id:user._id},"Aksha@91unduURNEJjsj",{expiresIn:"2d"})
+const token=await jwt.sign({_id:user._id},process.env.SECRET_KEY,{expiresIn:"2d"})
 return token;
 }
 const userModel=mongoose.model("User",userSchema)

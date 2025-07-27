@@ -39,5 +39,9 @@ const removeOrphanedChildren = async () => {
 
   console.log(`Cleaned ${orphanedIds.length} orphaned connection requests`);
 };
-
-module.exports={validateLogin,validateEditProfile,removeOrphanedChildren}
+const validatePassword=(password)=>{
+if(!validator.isStrongPassword(password)){
+throw new Error("password is too weak")
+}
+}
+module.exports={validateLogin,validateEditProfile,removeOrphanedChildren,validatePassword}

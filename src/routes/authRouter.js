@@ -5,8 +5,9 @@ const bcrypt=require("bcrypt")
 const cookieParser=require("cookie-parser")
 const jwt=require('jsonwebtoken')
 const {validateLogin}=require('../utils/valid.js')
+const validator=require('validator')
 const {Auth}=require('../middleware/auth.js')
-
+const{validatePassword}=require('../utils/valid.js')
 authRouter.use(express.json())
 authRouter.use(cookieParser())
 // cookie parser is used to parse the cookie sent from the browser and decipher it
@@ -16,12 +17,15 @@ try{
 // We need to validate the data using util functions
 // we need to encrypt the passwords
 const {email,password,firstName,lastName}=req.body;
+if(!email||!password){
+throw new Error("All feilds are mandatory")
+}
 const doesUserExist=await userModel.findOne({email:email})
 if(doesUserExist){
 throw new Error("Already existing user please login")
 }
+validatePassword(password)
 const passwordHash=await bcrypt.hash(password,10)
-// console.log(req)
 // creating instance of the user model and pushing the data into the collection.
 const user=new userModel({
 firstName:firstName,
@@ -64,7 +68,7 @@ if(passwordValid){
 // token which will be sent to the server everytime the user hits an API.
 const token=await user.getJWT()
 res.cookie("token",token,{httpOnly:true,secure:true,sameSite:"None"})
-res.send(user)
+res.send({token,user})
 }
 else{
 throw new Error("Invalid credentials")
@@ -79,7 +83,6 @@ authRouter.post('/logout',async(req,res)=>{
 res.cookie("token",null,{
 expires:new Date(Date.now())
 })
-console.log(req.originalUrl)
 res.send("User logged out sucessfully")
 })
 module.exports={authRouter}
