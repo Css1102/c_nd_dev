@@ -1,6 +1,5 @@
 node_modules
 config
-utils
 apiList.md
 .env
 main.py

@@ -3,7 +3,6 @@ const express=require('express')
 const chatRouter=express.Router()
 const {Auth}=require('../middleware/auth.js')
 const {onlineUsers}=require('../utils/socket.js')
-const { now } = require('mongoose')
 chatRouter.get('/chat/:toChatId',Auth,async(req,res)=>{
 try{
 const {toChatId}=req.params
