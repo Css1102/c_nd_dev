@@ -8,11 +8,22 @@ const createRoomIdHash=(userId,toChatId)=>{
 const hash=crypto.createHash('sha256').update([userId,toChatId].sort().join("_")).digest('hex')
 }
 const onlineUsers=new Map()
+const allowedOrigins=[
+"https://resocf-2.onrender.com/",
+"http://localhost:5173"
+]
 
 const initialiseSocket=(server)=>{
 const io=socket(server,{
 cors:{
-origin:"http://localhost:5173",
+origin:(origin,callback)=>{
+if(!origin || allowedOrigins.includes(origin)){
+ callback(null,true)
+}
+else{
+callback(new Error('Not allowed by CORS'));
+}
+},
 credentials:true
 }
 })
