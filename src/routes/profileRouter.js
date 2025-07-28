@@ -51,7 +51,6 @@ try{
 const email=req.body.email
 const passwordOld=req.body.password
 const userExist=await userModel.findOne({email:email})
-console.log(userExist)
 if(!userExist){
 throw new Error("User not found in Db")
 }

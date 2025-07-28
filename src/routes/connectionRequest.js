@@ -30,7 +30,6 @@ $or:[{requestFrom:fromUserId,requestTo:toUserId}
 }
 ],
 })
-console.log(isExistingRequest)
 const userExist=await userModel.findById(toUserId)
 if(!userExist){
 res.status(404).json({message:"User not found"})
