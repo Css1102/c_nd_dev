@@ -30,6 +30,7 @@ callback(new Error('Not allowed by CORS'));
 credentials:true
 }
 app.use(cors(corsOption))
+app.options('*', cors(corsOption)); 
 app.use(express.json())
 app.use(cookieParser())
 // cookie parser is used to parse the cookie sent from the browser and decipher it
