@@ -25,6 +25,9 @@ io.on("connection",(socket)=>{
 const userId=socket.user._id
 console.log(userId)
 onlineUsers.set(userId,{socketId:socket.id,lastSeen:null})
+const userSockets = onlineUsers.get(userId) || new Set();
+userSockets.add(socket.id);
+onlineUsers.set(userId, userSockets);
 socket.on("joinChat",({userId,toChatId})=>{
     // each room created needs to hame a unique Id
 const roomId=createRoomIdHash(userId,toChatId)
@@ -66,11 +69,15 @@ console.error(err.message)
 })
 socket.on("disconnect",()=>{
 onlineUsers.set(userId,{socketId:null,lastSeen:new Date().toISOString()})
-    io.emit("userStatusChanged", {
-      userId,
-      isOnline: false,
-      lastSeen: onlineUsers.get(userId).lastSeen,
-    });
+userSockets.delete(socket.id);
+if (userSockets.size === 0) {
+  onlineUsers.delete(userId);
+  io.emit("userStatusChanged", {
+    userId,
+    isOnline: false,
+    lastSeen: new Date().toISOString()
+  });
+}
 })
 })
 }
