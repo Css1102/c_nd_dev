@@ -9,7 +9,7 @@ const hash=crypto.createHash('sha256').update([userId,toChatId].sort().join("_")
 }
 const onlineUsers=new Map()
 const allowedOrigins=[
-"https://resocf-2.onrender.com/",
+"https://resocf-2.onrender.com",
 "http://localhost:5173"
 ]
 
