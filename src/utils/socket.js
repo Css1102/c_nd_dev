@@ -6,6 +6,7 @@ const {userModel}=require('../model/user')
 const {Chat}=require('../model/chat')
 const createRoomIdHash=(userId,toChatId)=>{
 const hash=crypto.createHash('sha256').update([userId,toChatId].sort().join("_")).digest('hex')
+return hash
 }
 const onlineUsers=new Map()
 const allowedOrigins=[
@@ -26,7 +27,9 @@ const userId=socket.user._id
 console.log(userId)
 onlineUsers.set(userId,{socketId:socket.id,lastSeen:null})
 const userSockets = onlineUsers.get(userId) || new Set();
+if(userSockets instanceof Set){
 userSockets.add(socket.id);
+}
 onlineUsers.set(userId, userSockets);
 socket.on("joinChat",({userId,toChatId})=>{
     // each room created needs to hame a unique Id
@@ -69,8 +72,10 @@ console.error(err.message)
 })
 socket.on("disconnect",()=>{
 onlineUsers.set(userId,{socketId:null,lastSeen:new Date().toISOString()})
+if(userSockets){
 userSockets.delete(socket.id);
-if (userSockets.size === 0) {
+}
+if (userSockets?.size === 0) {
   onlineUsers.delete(userId);
   io.emit("userStatusChanged", {
     userId,
