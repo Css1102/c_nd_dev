@@ -2,4 +2,4 @@ node_modules
 config
 apiList.md
 .env
-main.py
+../utils/otp_gen.js

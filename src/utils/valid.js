@@ -17,7 +17,7 @@ throw new Error("Invalid feild update request")
 }
 const validateLogin=(data)=>{
 if(!data ||  !validator.isEmail(data)){
-throw new Error("mail regex match failed")
+throw new Error("Email not in proper format")
 }
 }
 

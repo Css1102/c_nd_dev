@@ -49,18 +49,24 @@ res.status(400).send(err.message)
 profileRouter.post('/profile/forgotPassword',async(req,res)=>{
 try{
 const email=req.body.email
-const passwordOld=req.body.password
 const userExist=await userModel.findOne({email:email})
 if(!userExist){
 throw new Error("User not found in Db")
 }
-const oldPasswrdComp=await bcrypt.compare(passwordOld,userExist.password)
-if(!oldPasswrdComp){
-throw new Error("Password doesnt match")
+const newPassword=(req.body.new_password)
+const confirm_newPassword=(req.body.confirm_newpassword)
+console.log("reached till here")
+const newPasswrdComp=newPassword===confirm_newPassword
+console.log(newPasswrdComp)
+if(newPasswrdComp){
+const userWithNewPassword=await userModel.findOneAndUpdate({_id:userExist._id},{password:await bcrypt.hash(newPassword,10)})
+res.json({message:"Password is updated successfully!",
+  data:userExist
+})
 }
-const newPassword=await bcrypt.hash(req.body.new_password,10)
-const userWithNewPassword=await userModel.findOneAndUpdate({_id:userExist._id},{password:newPassword})
-res.send("Password is updated successfully!")
+else{
+throw new Error("the entered passwords do not match")
+}
 }
 catch(err){
 res.status(400).send(err.message)

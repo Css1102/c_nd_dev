@@ -25,6 +25,7 @@ if(doesUserExist){
 throw new Error("Already existing user please login")
 }
 validatePassword(password)
+validateLogin(email)
 const passwordHash=await bcrypt.hash(password,10)
 // creating instance of the user model and pushing the data into the collection.
 const user=new userModel({

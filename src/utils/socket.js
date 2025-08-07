@@ -72,7 +72,7 @@ console.error(err.message)
 })
 socket.on("disconnect",()=>{
 onlineUsers.set(userId,{socketId:null,lastSeen:new Date().toISOString()})
-if(userSockets){
+if(userSockets instanceof Set){
 userSockets.delete(socket.id);
 }
 if (userSockets?.size === 0) {

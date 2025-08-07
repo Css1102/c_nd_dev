@@ -8,6 +8,7 @@ const {authRouter}=require('./routes/authRouter.js')
 const {userRouter}=require('./routes/userRouter.js')
 const {profileRouter}=require('./routes/profileRouter.js')
 const {connectionReqRouter}=require('./routes/connectionRequest.js')
+const {skillMatchRouter}=require('./routes/skillMatchRouter.js')
 const cookieParser=require("cookie-parser")
 const cors=require('cors')
 const http=require('http')
@@ -42,6 +43,7 @@ app.use('/',profileRouter)
 app.use('/',connectionReqRouter)
 app.use('/',userRouter)
 app.use('/',chatRouter)
+app.use('/',skillMatchRouter)
 app.get('/user',async(req,res)=>{
 const userEmail=req.body?.email
 try{
