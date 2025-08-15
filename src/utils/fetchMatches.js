@@ -1,8 +1,10 @@
 const axios=require('axios')
+const env=require('dotenv').config()
+const FASTAPI_URL = process.env.FASTAPI_URL || "http://localhost:8000";
 async function fetchSkillMatches(userIds) {
   try {
     console.log(userIds)
-    const response = await axios.post("http://localhost:8000/match_from_db", userIds, {
+    const response = await axios.post(`${FASTAPI_URL}/match_from_db`, userIds, {
       headers: { "Content-Type": "application/json" },
     });
     console.log(response.data)
