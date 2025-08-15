@@ -9,9 +9,7 @@ const Redis=require('ioredis')
 skillMatchRouter.post('/match-skills',Auth,async(req,res)=>{
 try{
 const users=(req.body)
-console.log(users)
 const result=await fetchSkillMatches(users)
-console.log(result)
 const formatted = Object.entries(result).map(([pair, { score, match }]) => ({
   pair,
   score,

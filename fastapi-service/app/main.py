@@ -9,17 +9,25 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from typing import List
 from bson import ObjectId
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.config import settings
 # Load environment variables from .env
-load_dotenv(".env")  # Assumes .env is in the root directory
-print(os.getenv("MONGOSE_URI")+'gotenv')
+print(settings)
 app=FastAPI()
 # Get MongoDB URI
-MONGODB_URI = os.getenv("MONGOSE_URI")
-if not MONGODB_URI:
-    print(json.dumps({"error": "MongoDB URI not found"}))
-    sys.exit(1)
-
-client = MongoClient(MONGODB_URI)
+# MONGODB_URI = os.getenv("MONGOSE_URI")
+# if not MONGODB_URI:
+#     print(json.dumps({"error": "MongoDB URI not found"}))
+#     sys.exit(1)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[settings.ALLOWED_ORIGINS],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+client = MongoClient(settings.DB_URL)
 db = client["devTinder"]
 users_collection = db["users"]
 @app.get("/")
@@ -54,7 +62,7 @@ def match_from_db(payload:UserIDs):
             for j, name_b in enumerate(user_names):
                 if i != j:
                     score = round(similarity_matrix[i][j], 2)
-                    level = "High" if score > 0.60 else "Medium" if score >= 0.15 else "Low"
+                    level = "High" if score > 0.65 else "Medium" if score >= 0.15 else "Low"
                     results[f"{name_a}-{name_b}"] = { "score": score, "match": level }
 
         return results

@@ -1,5 +1,8 @@
 node_modules
 config
 apiList.md
-.env
-../utils/otp_gen.js
+**/.env
+**/.env.local
+**/.env.production
+__pycache__/
+*.pyc
