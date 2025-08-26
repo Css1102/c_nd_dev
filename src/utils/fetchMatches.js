@@ -2,7 +2,7 @@ const axios=require('axios')
 const {createClient}=require('redis')
 const env=require('dotenv').config()
 let client=null
-if(process.env.NODE_ENV===development){
+if(process.env.NODE_ENV==='development'){
  client=createClient({
 username:'default',
 password:process.env.REDIS_PASSWORD,
