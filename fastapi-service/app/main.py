@@ -6,6 +6,7 @@ from pymongo import MongoClient
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from typing import List
 from bson import ObjectId
@@ -39,9 +40,9 @@ class UserIDs(BaseModel):
     userIds: List[str]
 @app.post('/match_from_db')
 def match_from_db(payload:UserIDs):
+        print("Received userIds:", payload.userIds)
         users = {}
         userIds=payload.userIds
-        print(payload.userIds)
         for user_id in userIds:
             user_doc = users_collection.find_one({"_id": ObjectId(user_id)})
             if user_doc and "skills" in user_doc:
@@ -53,7 +54,7 @@ def match_from_db(payload:UserIDs):
         print(cleaned_skills.values())
         user_names = list(users.keys())
         user_skills = [" ".join(skill_list) for skill_list in cleaned_skills.values()]
-        vectorizer = CountVectorizer()
+        vectorizer = TfidfVectorizer()
         skill_vectors = vectorizer.fit_transform(user_skills)
         similarity_matrix = cosine_similarity(skill_vectors)
 
@@ -62,7 +63,7 @@ def match_from_db(payload:UserIDs):
             for j, name_b in enumerate(user_names):
                 if i != j:
                     score = round(similarity_matrix[i][j], 2)
-                    level = "High" if score > 0.65 else "Medium" if score >= 0.15 else "Low"
+                    level = "High" if score > 0.65 else "Medium" if score >= 0.10 else "Low"
                     results[f"{name_a}-{name_b}"] = { "score": score, "match": level }
 
         return results

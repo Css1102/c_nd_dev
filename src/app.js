@@ -9,6 +9,7 @@ const {userRouter}=require('./routes/userRouter.js')
 const {profileRouter}=require('./routes/profileRouter.js')
 const {connectionReqRouter}=require('./routes/connectionRequest.js')
 const {skillMatchRouter}=require('./routes/skillMatchRouter.js')
+const path=require('path')
 const cookieParser=require("cookie-parser")
 const cors=require('cors')
 const http=require('http')
@@ -33,6 +34,7 @@ credentials:true
 app.use(cors(corsOption))
 app.use(express.json())
 app.use(cookieParser())
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // cookie parser is used to parse the cookie sent from the browser and decipher it
 const server=http.createServer(app)
 initialiseSocket(server)

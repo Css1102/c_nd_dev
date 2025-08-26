@@ -7,7 +7,7 @@ const jwt=require('jsonwebtoken')
 const {validateLogin}=require('../utils/valid.js')
 const {Auth}=require('../middleware/auth.js')
 const {validateEditProfile}=require('../utils/valid.js')
-
+const {upload}=require('../middleware/multer.js')
 profileRouter.use(cookieParser())
 profileRouter.use(express.json())
 
@@ -26,7 +26,6 @@ catch(err){
 res.status(400).send(err.message)
 }
 })
-
 profileRouter.patch('/profile/edit',Auth,async(req,res)=>{
 try{
 validateEditProfile(req.body)
@@ -46,6 +45,7 @@ catch(err){
 res.status(400).send(err.message)
 }
 })
+
 profileRouter.post('/profile/forgotPassword',async(req,res)=>{
 try{
 const email=req.body.email
