@@ -1,12 +1,26 @@
 const axios=require('axios')
 const {createClient}=require('redis')
 const env=require('dotenv').config()
-const REDIS_URL=process.env.NODE_ENV===production? process.env.REDIS_URL:'redis://localhost:6379'
-const client = createClient({ url: REDIS_URL });
+let client=null
+if(process.env.NODE_ENV===development){
+ client=createClient({
+username:'default',
+password:process.env.REDIS_PASSWORD,
+socket:{
+host:process.env.REDIS_URL,
+port:process.env.REDIS_PORT
+}
+})
+}
+else{
+client = createClient({ url: 'http://localhost:6379' });
+}
 let redisReady = false;
 async function ensureRedisConnected() {
   if (!redisReady) {
-    await client.connect();
+    if(client){
+    await client.connect()
+    }
     redisReady = true;
   }
 }
