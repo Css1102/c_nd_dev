@@ -13,7 +13,7 @@ port:process.env.REDIS_PORT
 })
 }
 else{
-client = createClient({ url: 'http://localhost:6379' });
+client = createClient({ url: 'redis://localhost:6379' });
 }
 let redisReady = false;
 async function ensureRedisConnected() {
