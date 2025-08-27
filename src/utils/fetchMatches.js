@@ -38,7 +38,7 @@ async function fetchSkillMatches(userIds) {
   }
   try {
     console.log(userIds)
-    const response = await axios.post(`${FASTAPI_URL}match_from_db`, userIds, {
+    const response = await axios.post(`${FASTAPI_URL}/match_from_db`, userIds, {
       headers: { "Content-Type": "application/json" },
     });
       console.log("FastAPI response:", response.data);
