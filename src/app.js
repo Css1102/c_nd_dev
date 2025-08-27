@@ -20,6 +20,8 @@ const allowedOrigins=[
 ]
 // middleware used to convert the json data from request into js object and pushing into db
 app.set('trust proxy', 1);
+app.use(cors(corsOption))
+app.options('*', cors(corsOption));
 const corsOption={
 origin:(origin,callback)=>{
 if(!origin || allowedOrigins.includes(origin)){
@@ -31,7 +33,7 @@ callback(new Error('Not allowed by CORS'));
 },
 credentials:true
 }
-app.use(cors(corsOption))
+// app.use(cors(corsOption))
 app.use(express.json())
 app.use(cookieParser())
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
