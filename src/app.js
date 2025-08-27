@@ -32,6 +32,7 @@ callback(new Error('Not allowed by CORS'));
 credentials:true
 }
 app.use(cors(corsOption))
+app.options('/any', cors(corsOption));
 app.use(express.json())
 app.use(cookieParser())
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
