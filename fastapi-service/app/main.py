@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
-from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from typing import List
