@@ -14,11 +14,8 @@ load_dotenv(dotenv_path=env_path)
 class Settings(BaseSettings):
     ENV:str=ENV
     DB_URL: str
-    ALLOWED_ORIGINS_RAW: str
+    ALLOWED_ORIGINS: str
     PORT_FASTAPI: int = 8000  # Optional default
-    @property
-    def ALLOWED_ORIGINS(self) -> list[str]:
-        return [origin.strip() for origin in self.ALLOWED_ORIGINS_RAW.split(",") if origin.strip()]
     class Config:
         env_file = env_path  # Pydantic fallback
 
