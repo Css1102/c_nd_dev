@@ -1,7 +1,8 @@
 import os
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
-from pydantic import field_validator
+from pydantic import field_validator, Field, PlainSerializer
+from typing import Annotated
 # Step 1: Detect environment
 ENV = os.getenv("ENV", "local")
 
@@ -13,7 +14,8 @@ load_dotenv(dotenv_path=env_path)
 class Settings(BaseSettings):
     ENV:str=ENV
     DB_URL: str
-    ALLOWED_ORIGINS:list[str]
+    ALLOWED_ORIGINS:Annotated[list[str],PlainSerializer(lambda v:','.join(v),return_type=str,when_used="json")
+    ]=Field(default_factory=list)
     PORT_FASTAPI: int = 8000  # Optional default
     @field_validator("ALLOWED_ORIGINS", mode="before")
     @classmethod
