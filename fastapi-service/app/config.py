@@ -14,7 +14,7 @@ load_dotenv(dotenv_path=env_path)
 class Settings(BaseSettings):
     ENV:str=ENV
     DB_URL: str
-    ALLOWED_ORIGINS: str
+    ALLOWED_ORIGINS: list[str]
     PORT_FASTAPI: int = 8000  # Optional default
     class Config:
         env_file = env_path  # Pydantic fallback
