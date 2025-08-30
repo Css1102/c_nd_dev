@@ -1,7 +1,7 @@
 import os
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
-
+from pydantic import field_validator
 # Step 1: Detect environment
 ENV = os.getenv("ENV", "local")
 
@@ -15,7 +15,12 @@ class Settings(BaseSettings):
     DB_URL: str
     ALLOWED_ORIGINS:list[str]
     PORT_FASTAPI: int = 8000  # Optional default
-
+    @field_validator("ALLOWED_ORIGINS", mode="before")
+    @classmethod
+    def parse_origins(cls, v):
+        if isinstance(v, str):
+            return [origin.strip() for origin in v.split(",")]
+        return v
     class Config:
         env_file = env_path  # Pydantic fallback
 
