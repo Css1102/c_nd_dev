@@ -14,15 +14,11 @@ load_dotenv(dotenv_path=env_path)
 class Settings(BaseSettings):
     ENV:str=ENV
     DB_URL: str
-    ALLOWED_ORIGINS:Annotated[list[str],PlainSerializer(lambda v:','.join(v),return_type=str,when_used="json")
-    ]=Field(default_factory=list)
+    ALLOWED_ORIGINS_RAW: str
     PORT_FASTAPI: int = 8000  # Optional default
-    @field_validator("ALLOWED_ORIGINS", mode="before")
-    @classmethod
-    def parse_origins(cls, v):
-        if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",")]
-        return v
+    @property
+    def ALLOWED_ORIGINS(self) -> list[str]:
+        return [origin.strip() for origin in self.ALLOWED_ORIGINS_RAW.split(",") if origin.strip()]
     class Config:
         env_file = env_path  # Pydantic fallback
 
