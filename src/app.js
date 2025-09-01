@@ -15,7 +15,7 @@ const cors=require('cors')
 const http=require('http')
 const {initialiseSocket}=require('./utils/socket.js')
 const allowedOrigins=[
-"https://resocf-2.onrender.com",
+"http://51.20.105.87",
 "http://localhost:5173"
 ]
 // middleware used to convert the json data from request into js object and pushing into db

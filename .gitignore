@@ -5,4 +5,4 @@ apiList.md
 **/.env.local
 **/.env.production
 __pycache__/
-*.pyc
+*.pycfastapi-service/venv
