@@ -6,7 +6,7 @@ const {Auth}=require('../middleware/auth.js')
 const axios=require('axios')
 const Redis=require('ioredis')
 
-skillMatchRouter.post('/match-skills',Auth,async(req,res)=>{
+skillMatchRouter.post('/match-skills',async(req,res)=>{
 try{
 const users=(req.body)
 const result=await fetchSkillMatches(users)

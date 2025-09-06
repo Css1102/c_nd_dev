@@ -11,7 +11,9 @@ return hash
 const onlineUsers=new Map()
 const allowedOrigins=[
 "https://resocf-2.onrender.com",
-"http://localhost:5173"
+"http://localhost:5173",
+'https://reso-6dtw3iu3c-chiranjeev-singh-sethis-projects.vercel.app',
+/\.vercel\.app$/ 
 ]
 
 const initialiseSocket=(server)=>{

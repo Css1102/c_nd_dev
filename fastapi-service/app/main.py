@@ -11,15 +11,12 @@ from typing import List
 from bson import ObjectId
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import inspect
+from fastapi.routing import APIRoute
 from app.config import settings
 # Load environment variables from .env
 print(settings)
 app=FastAPI()
-# Get MongoDB URI
-# MONGODB_URI = os.getenv("MONGOSE_URI")
-# if not MONGODB_URI:
-#     print(json.dumps({"error": "MongoDB URI not found"}))
-#     sys.exit(1)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS.split(','),
@@ -35,10 +32,15 @@ def read_root():
     return {"message": "Hello, FastAPI is working!"}
 
 
+for route in app.routes:
+    if isinstance(route, APIRoute):
+        print(f"{route.path} -> {route.methods}")
+
 class UserIDs(BaseModel):
     userIds: List[str]
 @app.post('/match_from_db')
 def match_from_db(payload:UserIDs):
+    try:
         print("Received userIds:", payload.userIds)
         users = {}
         userIds=payload.userIds
@@ -66,7 +68,8 @@ def match_from_db(payload:UserIDs):
                     results[f"{name_a}-{name_b}"] = { "score": score, "match": level }
 
         return results
-
+    except ValueError as e:
+        print("Could not compute skill match"+e)
 if __name__ == "__main__":
     import uvicorn  
     port = int(os.getenv("PORT_FASTAPI", 8000))

@@ -1,60 +1,123 @@
-const axios=require('axios')
-const {createClient}=require('redis')
-const env=require('dotenv').config()
-let client=null
-if(process.env.NODE_ENV==='development'){
- client=createClient({
-username:'default',
-password:process.env.REDIS_PASSWORD,
-socket:{
-host:process.env.REDIS_URL,
-port:process.env.REDIS_PORT
-}
-})
-}
-else{
-client = createClient({ url: 'redis://localhost:6379' });
-}
+const axios = require('axios');
+const { createClient } = require('redis');
+
+const FASTAPI_URL = process.env.FASTAPI_URL || "http://localhost:8000";
+const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD || null;
+const REDIS_PORT=process.env.REDIS_PORT||6379
+let redisClient = null;
 let redisReady = false;
-async function ensureRedisConnected() {
-  if (!redisReady) {
-    if(client){
-    await client.connect()
-    }
+
+// Initialize Redis safely
+async function initRedis() {
+  if (!REDIS_URL || redisReady) return;
+
+  try {
+    redisClient = createClient({
+      username: 'default',
+      ...REDIS_PASSWORD && {password:REDIS_PASSWORD},
+      socket: {
+        ...REDIS_URL && {host:REDIS_URL},
+        ...REDIS_PORT && {port:REDIS_PORT},
+        reconnectStrategy: () => 1000, // retry every second
+      },
+    });
+
+    redisClient.on('error', (err) => {
+      console.warn("⚠️ Redis error:", err.message);
+      redisReady = false;
+    });
+
+    await redisClient.connect();
     redisReady = true;
+    console.log("✅ Redis connected");
+  } catch (err) {
+    console.warn("❌ Redis connection failed:", err.message);
+    redisReady = false;
   }
 }
-const FASTAPI_URL = process.env.FASTAPI_URL || "http://localhost:8000";
+
 async function fetchSkillMatches(userIds) {
-  await ensureRedisConnected()
-   const [userA, userB] = userIds.userIds;
+  await initRedis();
+
+  const [userA, userB] = userIds.userIds;
   const cacheKey = `match:${userA}:${userB}`;
 
-  // 🔍 Check Redis cache
-  const cached = await client.get(cacheKey);
-  if (cached) {
-    console.log(`Cache hit for ${cacheKey}`);
-    return { [`${userA}-${userB}`]: JSON.parse(cached) };
+  // Try Redis cache
+  if (redisReady) {
+    try {
+      const cached = await redisClient.get(cacheKey);
+      if (cached) {
+        console.log(`📦 Cache hit for ${cacheKey}`);
+        return { [`${userA}-${userB}`]: JSON.parse(cached) };
+      }
+    } catch (err) {
+      console.warn("⚠️ Redis get failed:", err.message);
+    }
   }
+
+  // Call FastAPI
   try {
-    console.log(userIds)
-    const response = await axios.post(`${FASTAPI_URL}/match_from_db`, userIds, {
-      headers: { "Content-Type": "application/json" },
-    });
-      console.log("FastAPI response:", response.data);
-        const matches = response.data;
+    console.log("🚀 Calling FastAPI at:", `${FASTAPI_URL}/match_from_db`);
+    const response = await axios.post(
+      `${FASTAPI_URL}/match_from_db`,
+      userIds,
+      { headers: { "Content-Type": "application/json" } }
+    );
+
+    const matches = response.data;
     const matchData = matches[`${userA}-${userB}`];
 
-    await client.set(cacheKey, JSON.stringify(matchData), 'EX', 3600);
-    // Object.entries(matches).forEach(([pair, data]) => {
-    //   console.log(`${pair}: ${data.match} match (${data.score})`);
-    // });
+    // Try to cache result
+    if (redisReady && matchData) {
+      try {
+        await redisClient.set(cacheKey, JSON.stringify(matchData), {
+          EX: 3600, // 1 hour
+        });
+        console.log(`✅ Cached result for ${cacheKey}`);
+      } catch (err) {
+        console.warn("⚠️ Redis set failed:", err.message);
+      }
+    }
 
     return matches;
   } catch (error) {
-    console.error("Error fetching skill matches:", error.message);
+    console.error("❌ FastAPI call failed:", error.message);
+    if (error.response) {
+      console.error("Response:", error.response.data);
+    }
     return null;
   }
 }
 
-module.exports = {fetchSkillMatches};
+module.exports = { fetchSkillMatches };
+
+// const axios = require('axios');
+
+// const FASTAPI_URL = process.env.FASTAPI_URL || "http://localhost:8000";
+
+// async function fetchSkillMatches(userIds) {
+//   try {
+//     console.log("🚀 Calling FastAPI at:", `${FASTAPI_URL}/match_from_db`);
+//     console.log("📦 Payload:", userIds);
+
+//     const response = await axios.post(
+//       `${FASTAPI_URL}/match_from_db`,
+//       userIds,
+//       { headers: { "Content-Type": "application/json" } }
+//     );
+
+//     console.log("✅ FastAPI response:", response.data);
+//     return response.data;
+
+//   } catch (error) {
+//     console.error("❌ Error fetching skill matches:", error.message);
+//     if (error.response) {
+//       console.error("Response data:", error.response.data);
+//       console.error("Status code:", error.response.status);
+//     }
+//     return null;
+//   }
+// }
+
+// module.exports = { fetchSkillMatches };

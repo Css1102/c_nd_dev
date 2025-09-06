@@ -15,7 +15,7 @@ const cors=require('cors')
 const http=require('http')
 const {initialiseSocket}=require('./utils/socket.js')
 const allowedOrigins=[
-"http://51.20.105.87",
+"https://reso-cf.vercel.app",
 "http://localhost:5173"
 ]
 // middleware used to convert the json data from request into js object and pushing into db
@@ -32,10 +32,12 @@ callback(new Error('Not allowed by CORS'));
 credentials:true
 }
 app.use(cors(corsOption))
-app.options('/any', cors(corsOption));
 app.use(express.json())
 app.use(cookieParser())
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.get("/", (req, res) => {
+  res.json({ status: "ok", service: "backend" });
+});
+
 // cookie parser is used to parse the cookie sent from the browser and decipher it
 const server=http.createServer(app)
 initialiseSocket(server)
@@ -65,7 +67,7 @@ console.log("oops some issue is there")
 
 DBConnect().then(()=>{
 console.log("database connection estabished")
-server.listen(process.env.PORT || 7646,()=>{
+server.listen(process.env.PORT || 7646,'0.0.0.0',()=>{
 console.log(`listening at port no ${process.env.PORT}`)
 })
 }).catch((err)=>{
